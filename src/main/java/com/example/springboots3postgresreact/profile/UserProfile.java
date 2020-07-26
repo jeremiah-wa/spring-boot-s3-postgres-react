@@ -1,5 +1,6 @@
 package com.example.springboots3postgresreact.profile;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class UserProfile {
@@ -16,15 +17,15 @@ public class UserProfile {
     }
 
     public UUID getUserProfileId() {
-        return userProfileId;
+        return this.userProfileId;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String getUserProfileImageLink() {
-        return userProfileImageLink;
+    public Optional<String> getUserProfileImageLink() {
+        return Optional.ofNullable(this.userProfileImageLink);
     }
 
     public void setUsername(String username) {
