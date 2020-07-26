@@ -3,6 +3,7 @@ package com.example.springboots3postgresreact.controllers;
 import com.example.springboots3postgresreact.profile.UserProfile;
 import com.example.springboots3postgresreact.services.UserProfileService;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,7 @@ public class UserProfileController {
         this.userProfileService = userProfileService;
     }
 
+    @GetMapping
     public List<UserProfile> getUserProfiles(){
         return userProfileService.getUserProfiles();
     }

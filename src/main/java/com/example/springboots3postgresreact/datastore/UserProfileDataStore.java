@@ -19,16 +19,18 @@ public class UserProfileDataStore implements UserProfileDao{
 
     @Override
     public int insertUserProfile(UserProfile userProfile) {
-        return 0;
+        return DB.add(userProfile)? 1 : 0;
     }
 
     @Override
     public List<UserProfile> getUserProfiles() {
-        return null;
+        return DB;
     }
 
     @Override
     public Optional<UserProfile> getUserProfileById(UUID id) {
-        return Optional.empty();
+        return DB.stream()
+                .filter(user -> user.getUserProfileId().equals(id))
+                .findFirst();
     }
 }
