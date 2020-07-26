@@ -2,12 +2,12 @@ package com.example.springboots3postgresreact.controllers;
 
 import com.example.springboots3postgresreact.profile.UserProfile;
 import com.example.springboots3postgresreact.services.UserProfileService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping({"api/v1/user-profile"})
@@ -24,4 +24,16 @@ public class UserProfileController {
     public List<UserProfile> getUserProfiles(){
         return userProfileService.getUserProfiles();
     }
+
+    @PostMapping(
+            path = "{userProfileId}/image/upload",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public void uploadUserProfileImage(@PathVariable("userProfileId") UUID userProfileId,
+                                       @RequestParam("file") MultipartFile file) {
+        userProfileService.uploadUserProfileImage(userProfileId,file);
+    }
+
+
 }
