@@ -57,6 +57,7 @@ function MyDropzone({ userProfileId }) {
       }
     ).then(() => {
       console.log("file uploaded successfully")
+      window.location.reload();
     }).catch(err => {
       console.log(err);
     })
