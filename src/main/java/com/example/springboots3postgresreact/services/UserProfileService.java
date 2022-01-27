@@ -21,7 +21,7 @@ public class UserProfileService {
     private final FileStore fileStore;
 
     @Autowired
-    public UserProfileService(@Qualifier("fakeDatabase") UserProfileDao userProfileDao, FileStore fileStore) {
+    public UserProfileService(@Qualifier("postgres") UserProfileDao userProfileDao, FileStore fileStore) {
         this.userProfileDao = userProfileDao;
         this.fileStore = fileStore;
     }
@@ -59,6 +59,12 @@ public class UserProfileService {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+
+//      7. update database with image link
+        if (userProfileDao.updateUserProfileById(userProfileId,user)<=0) {
+            throw new IllegalStateException("Failed to update database");
+        }
+
     }
 
     private Map<String, String> getMetadata(MultipartFile file) {

@@ -1,50 +1,64 @@
 package com.example.springboots3postgresreact.datastore;
 
 import com.example.springboots3postgresreact.profile.UserProfile;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository("fakeDatabase")
+@Repository("postgres")
 public class UserProfileDataStore implements UserProfileDao{
 
-    private static final List<UserProfile> DB = new ArrayList<>();
+    private final JdbcTemplate jdbcTemplate;
 
-    static {
-        DB.add(new UserProfile(UUID.randomUUID(), "Sir Tom Jones", null));
+    @Autowired
+    public UserProfileDataStore(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public int insertUserProfile(UserProfile userProfile) {
-        return DB.add(userProfile)? 1 : 0;
+        return jdbcTemplate.update(
+                "INSERT INTO schema.demobd (id, username, userprofileimagelink) VALUES (?, ?)",
+                userProfile.getUserProfileId(), userProfile.getUsername(), userProfile.getUserProfileImageLink()
+        );
     }
 
     @Override
     public List<UserProfile> getUserProfiles() {
-        return DB;
+        String sql = "SELECT * FROM userprofile";
+        return jdbcTemplate.query(sql, (resultSet, i) -> {
+            UUID id = UUID.fromString(resultSet.getString("id"));
+            String username = resultSet.getString("username");
+            String userProfileImageLink = resultSet.getString("userprofileimagelink");
+            return new UserProfile(id, username, userProfileImageLink);
+        });
     }
 
     @Override
     public Optional<UserProfile> getUserProfileById(UUID userProfileId) {
-        return DB.stream()
-                .filter(user -> user.getUserProfileId().equals(userProfileId))
-                .findFirst();
+        String sql = "SELECT * FROM userprofile WHERE id=?";
+
+        UserProfile userProfile = jdbcTemplate.queryForObject(sql, new Object[]{userProfileId}, (resultSet, i) -> {
+            UUID id = UUID.fromString(resultSet.getString("id"));
+            String username = resultSet.getString("username");
+            String userProfileImageLink = resultSet.getString("userprofileimagelink");
+            return new UserProfile(id, username, userProfileImageLink);
+        });
+
+        return Optional.ofNullable(userProfile);
     }
 
     @Override
     public int updateUserProfileById(UUID userProfileId, UserProfile userProfile) {
-        return getUserProfileById(userProfileId)
-                .map(user -> {
-                    int indexOfUserToDelete = DB.indexOf(userProfile);
-                    if (indexOfUserToDelete >= 0) {
-                        DB.set(indexOfUserToDelete, userProfile);
-                        return 1;
-                    }
-                    return 0;
-                })
-                .orElse(0);
+        String sql = "UPDATE userprofile SET username=?, userprofileimagelink=? WHERE id=?";
+        return jdbcTemplate.update(sql,
+                userProfile.getUsername(),
+                userProfile.getUserProfileImageLink().orElse(null),
+                userProfileId);
     }
+
 }
